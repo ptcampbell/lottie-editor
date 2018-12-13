@@ -3,6 +3,7 @@
   "version": "0.0.5",
   "private": true,
   "dependencies": {
+    "@babel/runtime": "7.0.0-beta.55",
     "@material-ui/core": "1.3.0",
     "@material-ui/icons": "1.1.0",
     "color-invert": "0.0.3",
