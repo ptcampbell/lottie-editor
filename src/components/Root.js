@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import { diffTrimmedLines as diff } from 'diff';
-import { fade, hexToRgb, invert } from 'color-invert';
+import { hexToRgb, invert } from 'color-invert';
 import { SketchPicker as Picker } from 'react-color';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -43,7 +43,6 @@ export default class extends Component {
 
   componentWillMount() {
     const url = (window.location.href.split('src=')[1] || '').split('&')[0];
-
     if (url) this.fetchUrl(url, 'animation.json');
   }
 
@@ -102,39 +101,48 @@ export default class extends Component {
   pickColor = (color: Object) => {
     const { rows, selectedRow, selectedCol, json } = this.state;
 
-    const { i, j, k, a, asset } = rows[selectedRow];
-
     const newColor = color.hex;
 
     const newRows = rows;
-    newRows[selectedRow][this.cols[selectedCol].prop] = newColor;
+    newRows[selectedRow][this.cols[selectedCol]] = newColor;
+
+    const duplicateColors = [];
+    newRows.forEach((item, colorKey) => {
+      if (item.nm === newRows[selectedRow].nm) {
+        item.color = newColor;
+        duplicateColors.push(colorKey);
+      }
+    });
+
     this.setState({ rows: newRows });
 
     const newJson = JSON.parse(json);
 
     const { r, g, b } = hexToRgb(newColor);
 
-    if (asset === -1) {
-      if (newJson && newJson.layers) {
-        newJson.layers[i].shapes[j].it[k].c.k = [
-          toUnitVector(r),
-          toUnitVector(g),
-          toUnitVector(b),
-          a
-        ];
+    duplicateColors.forEach((item) => {
+      const { i, j, k, a, asset } = rows[item];
+      if (asset === -1) {
+        if (newJson && newJson.layers) {
+          newJson.layers[i].shapes[j].it[k].c.k = [
+            toUnitVector(r),
+            toUnitVector(g),
+            toUnitVector(b),
+            a
+          ];
+        }
+      } else {
+        // eslint-disable-next-line no-lonely-if
+        if (newJson && newJson.assets) {
+          newJson.assets[i].layers[item].shapes[j].it[k].c.k = [
+            toUnitVector(r),
+            toUnitVector(g),
+            toUnitVector(b),
+            a
+          ];
+        }
       }
-    } else {
-      // eslint-disable-next-line no-lonely-if
-      if (newJson && newJson.assets) {
-        newJson.assets[asset].layers[i].shapes[j].it[k].c.k = [
-          toUnitVector(r),
-          toUnitVector(g),
-          toUnitVector(b),
-          a
-        ];
-      }
-    }
-
+    });
     this.setState({ json: JSON.stringify(newJson) });
   };
 
@@ -283,30 +291,6 @@ export default class extends Component {
                       onChange={this.pickColor}
                       presetColors={presetColors}
                     />
-
-                    <div
-                      style={{
-                        backgroundColor:
-                          color === colors.white ? colors.black : colors.white
-                      }}>
-                      <Btn
-                        backgroundColor={color}
-                        fullWidth
-                        hoverColor={fade(color)}
-                        icon={
-                          <Lottie
-                            config={{ autoplay: false, loop: false }}
-                            fallback={
-                              <Icon name="Colorize" color={invert(color)} />
-                            }
-                            ref={this.assignAddAnimation}
-                            src={require('../assets/animations/added.json')}
-                          />
-                        }
-                        onClick={this.pushColor}
-                        style={styles.add}
-                      />
-                    </div>
                   </div>
                 )}
 
