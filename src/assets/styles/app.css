@@ -4,10 +4,66 @@ body,
   height: 100%;
 }
 
-#root {
-  display: flex;
+.app-wrapper {
+  display:flex;
 }
 
-body {
-  font-family: 'Delius', cursive;
+.dropzone {
+  flex:auto;
+}
+
+.canvas {
+  display:flex;
+  flex:auto;
+  background-color: transparent;
+  background-image: linear-gradient(0deg, transparent 24%, #D8F3ED 25%, #D8F3ED 26%, transparent 27%, transparent 74%, #D8F3ED 75%, #D8F3ED 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, #D8F3ED 25%, #D8F3ED 26%, transparent 27%, transparent 74%, #D8F3ED 75%, #D8F3ED 76%, transparent 77%, transparent);
+  height:100vh;
+  background-size:50px 50px;
+  flex-direction:column;
+}
+
+.animation {
+  margin:auto 0;
+}
+
+
+.right-panel {
+  width:421px;
+  height:100vh;
+  padding:15px;
+  overflow-y:scroll;
+  background-color:#F6F9FC;
+  border-left:1px solid #E9E9EC;
+  color:#261746;
+}
+
+.palette {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.swatch {
+  background-color:#fff;
+  width:100px;
+  margin:15px;
+  display:flex;
+  flex-direction: column;
+}
+
+.swatch .color {
+  width:100px;
+  height:100px;
+}
+
+.swatch .label {
+  width:100px;
+  font-size:14px;
+}
+
+.swatch .label p {
+  margin:0;
+}
+
+.swatch .label p:last-of-type {
+  opacity:0.5;
 }

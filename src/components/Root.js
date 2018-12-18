@@ -1,12 +1,17 @@
+/* eslint-disable react/sort-comp */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable react/prop-types */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable no-shadow */
 import React, { Component } from 'react';
 
 import { diffTrimmedLines as diff } from 'diff';
-import { hexToRgb, invert } from 'color-invert';
-import { SketchPicker as Picker } from 'react-color';
+import { hexToRgb } from 'color-invert';
+import { TwitterPicker as Picker } from 'react-color';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Dropzone from 'react-dropzone';
-import GithubCorner from 'react-github-corner';
 import log from 'log-with-style';
 import Snack from '@material-ui/core/Snackbar';
 
@@ -17,13 +22,8 @@ import { download, toUnitVector } from '../configs/utils';
 
 import Btn from './Btn';
 import ErrorView from './ErrorView';
-import Full from './Full';
 import Icon from './Icon';
 import Lottie from './Lottie';
-import Paper from './Paper';
-import Table from './Table';
-
-const { version } = require('../../package.json');
 
 export default class extends Component {
   state = {
@@ -34,7 +34,6 @@ export default class extends Component {
     picker: false,
     presetColors: Object.values(colors),
     rows: [],
-    selectedCol: -1,
     selectedRow: -1,
     snack: false,
     snackMessage: '',
@@ -45,37 +44,6 @@ export default class extends Component {
     const url = (window.location.href.split('src=')[1] || '').split('&')[0];
     if (url) this.fetchUrl(url, 'animation.json');
   }
-
-  // eslint-disable-next-line react/sort-comp
-  cols = [
-    {
-      prop: 'color',
-      render: (color, row, col) => {
-        const { picker, showLayerNames, rows } = this.state;
-
-        return (
-          <div // eslint-disable-line
-            style={Object.assign(
-              {},
-              { backgroundColor: color, color: invert(color) },
-              styles.colorRow,
-              styles.landing
-            )}
-            onClick={() =>
-              this.setState({
-                picker: !picker,
-                selectedCol: col,
-                selectedRow: row
-              })
-            }>
-            {color}
-            {showLayerNames && <br />}
-            {showLayerNames && rows[row].nm}
-          </div>
-        );
-      }
-    }
-  ];
 
   original = '';
 
@@ -99,12 +67,12 @@ export default class extends Component {
   assignAddAnimation = ref => (this.addAnimation = ref);
 
   pickColor = (color: Object) => {
-    const { rows, selectedRow, selectedCol, json } = this.state;
+    const { rows, selectedRow, json } = this.state;
 
     const newColor = color.hex;
 
     const newRows = rows;
-    newRows[selectedRow][this.cols[selectedCol]] = newColor;
+    newRows[selectedRow].color = newColor;
 
     const duplicateColors = [];
     newRows.forEach((item, colorKey) => {
@@ -165,11 +133,8 @@ export default class extends Component {
   upload = files => {
     if (files[0]) {
       this.setState({ loading: true });
-
       const reader = new FileReader();
-
       reader.onload = e => this.parse(e.target.result, files[0].name);
-
       reader.readAsText(files[0]);
     }
   };
@@ -240,15 +205,17 @@ export default class extends Component {
   toggleNames = () =>
     this.setState(state => ({ showLayerNames: !state.showLayerNames }));
 
+  toggleGroups = () =>
+    this.setState(state => ({ groupDuplicates: !state.groupDuplicates }));
+
   render() {
     const {
-      bugHoverColor,
       err,
       json,
-      linkHoverColor,
       loading,
       picker,
       presetColors,
+      showLayerNames,
       rows,
       selectedRow,
       snack,
@@ -257,192 +224,124 @@ export default class extends Component {
 
     const Animation = () =>
       json && (
-        <Lottie
-          fallback={<ErrorView color={colors.gray} />}
-          src={JSON.parse(json)}
-        />
+        <div className="animation">
+          <Lottie
+            fallback={<ErrorView color={colors.gray} />}
+            src={JSON.parse(json)}
+          />
+        </div>
       );
 
     const { color } = (rows && rows[selectedRow]) || {};
 
+    const Swatch = props => {
+        // eslint-disable-next-line react/prop-types
+        const { color, nm, i } = props;
+        return (
+            <div
+              className="swatch"
+              onClick={() =>
+                this.setState({
+                  picker: !picker,
+                  selectedRow: i
+                })
+            }>
+              <div className="color" style={{ backgroundColor: color }} />
+              <div className="label">
+                <p>{nm}</p>
+                <p>{color}</p>
+              </div>
+            </div>
+        );
+    };
+
+    const Palette = props => {
+        const { rows } = props;
+        return (
+            <div className="palette">
+                {rows.map((item, index) => <Swatch {...item} key={index} />)}
+            </div>
+        );
+    };
+
     return (
-      <Full style={styles.container}>
-        <h3 style={styles.header}>
-          <a style={styles.link} href="./">
-            Lottie Editor
-          </a>
-          <sub style={styles.subtitle}> {version}</sub>
-        </h3>
-
-        <Full style={styles.row}>
-          {!loading &&
-            json && (
-              <Paper style={styles.left}>
-                {picker && (
-                  <div style={styles.popover}>
-                    <div // eslint-disable-line
-                      onClick={this.hidePicker}
-                      style={styles.cover}
+      <div className="app-wrapper">
+        {json && !loading ? (
+          <div className="canvas">
+            <Animation />
+          </div>
+        ) : (
+        <div className="dropzone">
+          <Dropzone
+            accept="application/json"
+            multiple={false}
+            onDrop={this.upload}
+          >
+            {loading && (
+              <CircularProgress />
+            )}
+            {!loading && (
+              <div>
+                {err ? (
+                  <ErrorView />
+                ) : (
+                  <div className="upload">
+                    <Icon
+                      name="FileUpload"
+                      size={128}
                     />
-
-                    <Picker
-                      color={color}
-                      disableAlpha
-                      onChange={this.pickColor}
-                      presetColors={presetColors}
-                    />
+                    <h3>Drag and drop your JSON</h3>
                   </div>
                 )}
-
-                <Table noHead cols={this.cols} rows={rows} />
-              </Paper>
+              </div>
             )}
-
-          <Paper style={styles.right}>
-            <Dropzone
-              accept="application/json"
-              multiple={false}
-              onDrop={this.upload}
-              style={styles.dropzone}>
-              {loading && (
-                <CircularProgress style={{ color: colors.primary }} />
-              )}
-
-              {!loading && (
-                <Full>
-                  {err ? (
-                    <ErrorView color={colors.gray} />
-                  ) : json ? (
-                    <Animation />
-                  ) : (
-                    <Full style={styles.landing}>
-                      <Icon
-                        name="FileUpload"
-                        color={colors.primary}
-                        size={128}
-                      />
-                      <h3 style={styles.subtitle}>Drag and drop your JSON</h3>
-                    </Full>
-                  )}
-                </Full>
-              )}
-            </Dropzone>
-          </Paper>
-        </Full>
-
+          </Dropzone>
+        </div>
+        )}
         {!loading &&
           json && (
-            <div style={styles.bottom}>
-              <Paper style={styles.layersBtn}>
-                <Btn
-                  color="primary"
-                  variant="raised"
-                  onClick={this.toggleNames}
-                  style={{ width: 220 }}>
-                  <Icon name="Layers" color={colors.white} />
-                </Btn>
-              </Paper>
-
-              <Paper>
+            <div className="right-panel">
+              {picker && (
+                <div>
+                  <div // eslint-disable-line
+                    onClick={this.hidePicker}
+                    className="picker-cover"
+                  />
+                  <Picker
+                    color={color}
+                    disableAlpha
+                    onChange={this.pickColor}
+                    presetColors={presetColors}
+                  />
+                </div>
+              )}
+              <Palette
+                rows={rows}
+                picker={picker}
+                showLayerNames={showLayerNames}
+              />
+              <div className="options">
+                  <Btn
+                    color="primary"
+                    variant="raised"
+                    onClick={this.toggleNames}
+                  >
+                    <Icon name="Layers" />
+                  </Btn>
+              </div>
+              <div className="export">
                 <Btn color="primary" variant="raised" onClick={this.export}>
-                  <Icon name="FileDownload" color={colors.white} />
+                    <Icon name="FileDownload" />
                 </Btn>
-              </Paper>
-            </div>
-          )}
-
-        {!loading &&
-          !json && (
-            <div style={Object.assign({}, styles.footer, styles.row)}>
-              <div style={Object.assign({}, styles.footerItem, { flex: 3 })}>
-                {
-                  "Files uploaded here won't be visible for public and aren't stored anywhere in the cloud."
-                }
-              </div>
-
-              <div
-                style={Object.assign({}, styles.footerItem, {
-                  marginLeft: 20
-                })}>
-                <a
-                  // href="./?src=https://editor.lottiefiles.com/whale.json"
-                  href="./?src=http://localhost:3000/whale.json"
-                  style={styles.link}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                  title="Append with /?src=YOUR_LINK">
-                  <Icon color={linkHoverColor} name="Link" />
-                </a>
-              </div>
-
-              <div
-                style={Object.assign({}, styles.footerItem, {
-                  marginLeft: 20
-                })}>
-                <a
-                  href="https://github.com/sonaye/lottie-editor/issues/1"
-                  rel="noopener noreferrer"
-                  style={styles.link}
-                  target="_blank"
-                  title="Not working? report here">
-                  <Icon name="BugReport" color={bugHoverColor} />
-                </a>
               </div>
             </div>
           )}
-
-        <GithubCorner
-          bannerColor={colors.primary}
-          href="https://github.com/sonaye/lottie-editor"
-          octoColor={colors.white}
-        />
-
         <Snack
           autoHideDuration={4000}
-          // bodyStyle={styles.snack}
           message={snackMessage}
-          // onRequestClose={this.closeSnack}
           open={snack}
         />
-      </Full>
+      </div>
     );
   }
 }
-
-const styles = {
-  add: { paddingBottom: 10, paddingTop: 10 },
-  bottom: {
-    marginTop: 20,
-    maxHeight: 48,
-    flexDirection: 'row',
-    display: 'flex'
-  },
-  colorRow: {
-    cursor: 'pointer',
-    fontSize: 16,
-    textAlign: 'center',
-    height: 48,
-    width: '100%',
-    display: 'flex'
-  },
-  container: {
-    padding: 20,
-    paddingRight: 40,
-    paddingLeft: 40,
-    backgroundColor: colors.grayLighter
-  },
-  cover: { bottom: 0, left: 0, position: 'fixed', right: 0, top: 0 },
-  dropzone: { cursor: 'pointer', display: 'flex', flex: 1 },
-  footer: { marginTop: 20 },
-  footerItem: { color: colors.gray, display: 'flex' },
-  header: { color: colors.primary, margin: 0, marginBottom: 17 },
-  landing: { alignItems: 'center', justifyContent: 'center' },
-  left: { marginRight: 40, width: 220 },
-  link: { color: colors.primary, textDecoration: 'none' },
-  popover: { position: 'absolute', zIndex: 1 },
-  right: { flex: 3, overflow: 'hidden' },
-  row: { display: 'flex', flexDirection: 'row' },
-  snack: { borderRadius: 0 },
-  subtitle: { color: colors.gray },
-  layersBtn: { width: 220, marginRight: 40 }
-};
