@@ -11,6 +11,30 @@ body,
 
 .dropzone {
   flex:auto;
+  border:none;
+  background-color:#F6F9FC;
+}
+
+.uploader {
+  width:100%;
+  height:100vh;
+}
+
+.uploader .upload-input {
+  height:100vh;
+  text-align:center;
+  width:100%;
+  opacity:0.5;
+}
+
+.upload-input svg {
+  margin-top:45vh;
+}
+
+.loading-animation {
+  position:fixed;
+  top:50vh;
+  left:50%;
 }
 
 .canvas {

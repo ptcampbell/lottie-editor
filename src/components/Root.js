@@ -237,9 +237,10 @@ export default class extends Component {
     const Swatch = props => {
         // eslint-disable-next-line react/prop-types
         const { color, nm, index } = props;
+        const truncatedName = nm.replace(/^#/, '');
         return (
             <div
-              className={`swatch ${index}`}
+              className={`swatch index_${index}`}
               onClick={() =>
                 this.setState({
                   picker: !picker,
@@ -248,7 +249,7 @@ export default class extends Component {
             }>
               <div className="color" style={{ backgroundColor: color }} />
               <div className="label">
-                <p>{nm}</p>
+                <p>{truncatedName}</p>
                 <p>{color}</p>
               </div>
             </div>
@@ -259,7 +260,7 @@ export default class extends Component {
         const { rows } = props;
         return (
             <div className="palette">
-                {rows.map((item, index) => <Swatch {...item} key={index} index={index} />)}
+              {rows.map((item, index) => <Swatch {...item} key={index} index={index} />)}
             </div>
         );
     };
@@ -273,19 +274,22 @@ export default class extends Component {
         ) : (
         <div className="dropzone">
           <Dropzone
+            className="uploader"
             accept="application/json"
             multiple={false}
             onDrop={this.upload}
           >
             {loading && (
-              <CircularProgress />
+              <div className="loading-animation">
+                <CircularProgress />
+              </div>
             )}
             {!loading && (
               <div>
                 {err ? (
                   <ErrorView />
                 ) : (
-                  <div className="upload">
+                  <div className="upload-input">
                     <Icon
                       name="FileUpload"
                       size={128}
