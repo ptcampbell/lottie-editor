@@ -236,14 +236,14 @@ export default class extends Component {
 
     const Swatch = props => {
         // eslint-disable-next-line react/prop-types
-        const { color, nm, i } = props;
+        const { color, nm, index } = props;
         return (
             <div
-              className="swatch"
+              className={`swatch ${index}`}
               onClick={() =>
                 this.setState({
                   picker: !picker,
-                  selectedRow: i
+                  selectedRow: index
                 })
             }>
               <div className="color" style={{ backgroundColor: color }} />
@@ -259,7 +259,7 @@ export default class extends Component {
         const { rows } = props;
         return (
             <div className="palette">
-                {rows.map((item, index) => <Swatch {...item} key={index} />)}
+                {rows.map((item, index) => <Swatch {...item} key={index} index={index} />)}
             </div>
         );
     };
@@ -302,7 +302,7 @@ export default class extends Component {
           json && (
             <div className="right-panel">
               {picker && (
-                <div>
+                <div className="popover">
                   <div // eslint-disable-line
                     onClick={this.hidePicker}
                     className="picker-cover"
@@ -320,15 +320,6 @@ export default class extends Component {
                 picker={picker}
                 showLayerNames={showLayerNames}
               />
-              <div className="options">
-                  <Btn
-                    color="primary"
-                    variant="raised"
-                    onClick={this.toggleNames}
-                  >
-                    <Icon name="Layers" />
-                  </Btn>
-              </div>
               <div className="export">
                 <Btn color="primary" variant="raised" onClick={this.export}>
                     <Icon name="FileDownload" />
