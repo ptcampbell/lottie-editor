@@ -7,6 +7,7 @@
 import React, { Component } from 'react';
 
 import { diffTrimmedLines as diff } from 'diff';
+import { uniqBy } from 'lodash';
 import { hexToRgb } from 'color-invert';
 import { TwitterPicker as Picker } from 'react-color';
 
@@ -232,12 +233,11 @@ export default class extends Component {
         </div>
       );
 
-    const { color } = (rows && rows[selectedRow]) || {};
-
     const Swatch = props => {
         // eslint-disable-next-line react/prop-types
         const { color, nm, index } = props;
         const truncatedName = nm.replace(/^#/, '');
+        const isActive = index === selectedRow;
         return (
             <div
               className={`swatch index_${index}`}
@@ -247,6 +247,22 @@ export default class extends Component {
                   selectedRow: index
                 })
             }>
+               {isActive &&
+                picker && (
+                  <div className="popover">
+                    <div // eslint-disable-line
+                      onClick={this.hidePicker}
+                      className="picker-cover"
+                    />
+                    <Picker
+                      color={color}
+                      disableAlpha
+                      onChange={this.pickColor}
+                      presetColors={presetColors}
+                      triangle="top-right"
+                    />
+                  </div>
+              )}
               <div className="color" style={{ backgroundColor: color }} />
               <div className="label">
                 <p>{truncatedName}</p>
@@ -258,9 +274,10 @@ export default class extends Component {
 
     const Palette = props => {
         const { rows } = props;
+        const unique = uniqBy(rows, 'nm');
         return (
             <div className="palette">
-              {rows.map((item, index) => <Swatch {...item} key={index} index={index} />)}
+              {unique.map((item, index) => <Swatch {...item} key={index} index={index} />)}
             </div>
         );
     };
@@ -305,20 +322,6 @@ export default class extends Component {
         {!loading &&
           json && (
             <div className="right-panel">
-              {picker && (
-                <div className="popover">
-                  <div // eslint-disable-line
-                    onClick={this.hidePicker}
-                    className="picker-cover"
-                  />
-                  <Picker
-                    color={color}
-                    disableAlpha
-                    onChange={this.pickColor}
-                    presetColors={presetColors}
-                  />
-                </div>
-              )}
               <Palette
                 rows={rows}
                 picker={picker}

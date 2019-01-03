@@ -35,11 +35,12 @@ body,
   position:fixed;
   top:50vh;
   left:50%;
+  margin:-30px;
 }
 
 .canvas {
   display:flex;
-  flex:auto;
+  width:calc(100% - 391px);
   background-color: transparent;
   background-image: linear-gradient(0deg, transparent 24%, #D8F3ED 25%, #D8F3ED 26%, transparent 27%, transparent 74%, #D8F3ED 75%, #D8F3ED 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, #D8F3ED 25%, #D8F3ED 26%, transparent 27%, transparent 74%, #D8F3ED 75%, #D8F3ED 76%, transparent 77%, transparent);
   height:100vh;
@@ -53,7 +54,9 @@ body,
 
 
 .right-panel {
-  position:relative;
+  position:fixed;
+  top:0;
+  right:0;
   width:391px;
   height:100vh;
   padding:15px;
@@ -61,6 +64,7 @@ body,
   background-color:#F6F9FC;
   border-left:1px solid #E9E9EC;
   color:#261746;
+  overflow:visible;
 }
 
 .palette {
@@ -76,12 +80,12 @@ body,
   flex-direction: column;
   box-shadow:rgba(0, 0, 0, 0.06) 0px 2px 4px, rgba(0, 0, 0, 0.05) 0px 0.5px 1px;
   border-radius:4px;
-  transition:all 0.333s ease-out 0s;
+  transition: box-shadow 0.333s ease-out 0s;
   cursor:pointer;
+  position:relative;
 }
 
 .swatch:hover {
-  transform: translate3d(0px, -1px, 0px);
   box-shadow: rgba(0, 0, 0, 0.22) 0px 19px 43px, rgba(0, 0, 0, 0.12) 0px 4px 11px;
 }
 
@@ -126,16 +130,33 @@ body,
   background-color:#6264A7;
   color:#fff;
   height:50px;
+  transition:all 0.333s ease-out 0s;
+}
+
+.export button:hover {
+  background-color:#44467E;
 }
 
 .picker-cover {
   position:fixed;
   top:0;
   left:0;
-  width:100%;
+  width:100vw;
   height:100vh;
+  z-index:8;
 }
 
-.picker-wrap {
+/* .picker-wrap {
   position:absolute;
+} */
+
+.popover {
+  position:absolute;
+  z-index:9;
+  top: 175px;
+  right: 30px;
+}
+
+.twitter-picker {
+  z-index:11;
 }
