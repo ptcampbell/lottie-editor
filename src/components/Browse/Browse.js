@@ -2,7 +2,7 @@
 /* eslint-disable react/destructuring-assignment */
 import * as React from 'react';
 
-import SVGInline from 'react-svg-inline';
+// import SVGInline from 'react-svg-inline';
 import styled from 'styled-components';
 import { SpringGrid } from 'react-stonecutter';
 
@@ -42,11 +42,9 @@ export default class Browse extends React.Component<{}, {}> {
 
     render() {
         const { illustrations = {}, filter } = this.state;
-        // const svgXC = require('./xc.svg')
-        const svgMS = require('./ms.svg');
 
         return (
-            <div>
+            <StyledBrowse>
                 <Filter>
                     {/* <Icon iconName="Search" /> */}
                     <input placeholder="Find an illustration" onChange={(value) => this.handleSetFilter(value)} value={filter || ''} />
@@ -67,14 +65,18 @@ export default class Browse extends React.Component<{}, {}> {
                     ))}
                 </Grid>
                 <Footer>
-                    <SVGInline svg={svgMS} width={25} height={25} />
                     <p>XCS Illustration Toolkit</p>
                 </Footer>
                 <Blur />
-            </div>
+            </StyledBrowse>
         );
     }
 }
+
+const StyledBrowse = styled.div`
+    margin:0 auto;
+    color: #8898aa;
+`;
 
 const Grid = styled(SpringGrid)`
     margin: 0 auto;

@@ -45,18 +45,21 @@ export class Item extends React.Component {
 export default Item;
 
 const StyledItem = styled.div`
-    background-color: #fff;
-    box-shadow: 0 13px 27px -5px rgba(50, 50, 93, 0.1), 0 8px 16px -8px rgba(0, 0, 0, 0.15);
-    transition: all linear 300ms;
-    border-radius: 5px;
     width: 100%;
     height: 100%;
     position: relative;
-    transform: translateY(0px);
+    color: rgb(80, 80, 80);
+    background-color: rgb(255, 255, 255);
+    cursor: pointer;
+    position: relative;
+    backface-visibility: hidden;
+    box-shadow: rgba(0, 0, 0, 0.06) 0px 2px 4px, rgba(0, 0, 0, 0.05) 0px 0.5px 1px;
+    transition: all 0.333s ease-out 0s;
+    border-radius: 4px;
 
     &:hover {
-        box-shadow: 0 30px 60px -12px rgba(50, 50, 93, 0.2), 0 18px 36px -18px rgba(0, 0, 0, 0.2);
-        transform: translateY(-3px);
+        transform: translate3d(0px, -1px, 0px);
+        box-shadow: rgba(0, 0, 0, 0.22) 0px 19px 43px, rgba(0, 0, 0, 0.18) 0px 4px 11px;
     }
 `;
 
