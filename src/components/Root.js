@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable react/sort-comp */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/prop-types */
@@ -6,13 +7,13 @@
 /* eslint-disable no-shadow */
 import React, { Component } from 'react';
 
-import { diffTrimmedLines as diff } from 'diff';
+import { diff } from 'diff';
 import { uniqBy } from 'lodash';
 import { hexToRgb } from 'color-invert';
 import { TwitterPicker as Picker } from 'react-color';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Dropzone from 'react-dropzone';
+// import Dropzone from 'react-dropzone';
 import log from 'log-with-style';
 import Snack from '@material-ui/core/Snackbar';
 
@@ -25,6 +26,7 @@ import Btn from './Btn';
 import ErrorView from './ErrorView';
 import Icon from './Icon';
 import Lottie from './Lottie';
+import Browse from './Browse/Browse';
 
 export default class extends Component {
   state = {
@@ -211,6 +213,7 @@ export default class extends Component {
 
   render() {
     const {
+      // eslint-disable-next-line no-unused-vars
       err,
       json,
       loading,
@@ -284,11 +287,34 @@ export default class extends Component {
 
     return (
       <div className="app-wrapper">
-        {json && !loading ? (
+        {!json && <Browse />}
+        {loading && (
+            <div className="loading-animation">
+              <CircularProgress />
+            </div>
+        )}
+        {json && !loading && (
           <div className="canvas">
             <Animation />
           </div>
-        ) : (
+        )}
+        {!loading &&
+          json && (
+            <div className="right-panel">
+              <Palette
+                rows={rows}
+                picker={picker}
+                showLayerNames={showLayerNames}
+              />
+              <div className="export">
+                <Btn color="primary" variant="raised" onClick={this.export}>
+                    <Icon name="FileDownload" />
+                </Btn>
+              </div>
+            </div>
+        )}
+        {/*
+        // dropzone
         <div className="dropzone">
           <Dropzone
             className="uploader"
@@ -317,23 +343,7 @@ export default class extends Component {
               </div>
             )}
           </Dropzone>
-        </div>
-        )}
-        {!loading &&
-          json && (
-            <div className="right-panel">
-              <Palette
-                rows={rows}
-                picker={picker}
-                showLayerNames={showLayerNames}
-              />
-              <div className="export">
-                <Btn color="primary" variant="raised" onClick={this.export}>
-                    <Icon name="FileDownload" />
-                </Btn>
-              </div>
-            </div>
-          )}
+        </div> */}
         <Snack
           autoHideDuration={4000}
           message={snackMessage}
