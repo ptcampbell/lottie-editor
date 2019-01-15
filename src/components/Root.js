@@ -277,10 +277,12 @@ export default class extends Component {
 
     const Palette = props => {
         const { rows } = props;
-        const unique = uniqBy(rows, 'nm');
+        // const unique = uniqBy(rows, 'nm');
+        console.log(rows);
+
         return (
             <div className="palette">
-              {unique.map((item, index) => <Swatch {...item} key={index} index={index} />)}
+              {rows.map((item, index) => <Swatch {...item} key={index} index={index} />)}
             </div>
         );
     };

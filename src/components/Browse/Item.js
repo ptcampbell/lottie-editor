@@ -75,7 +75,7 @@ const Overlay = styled.div`
     z-index: 1;
     opacity: 0;
 
-    background: rgba(98, 100, 167, 0.8);
+    background: rgba(255,255,255,0.8);
     color: #fff;
     border-radius: 5px;
     box-sizing: border-box;
@@ -84,6 +84,7 @@ const Overlay = styled.div`
     cursor: pointer;
 
     h2 {
+        color: rgb(0,120,212);
         margin: 0 0 15px 0;
     }
 
@@ -107,8 +108,9 @@ const Animation = styled.div`
 
 const Tag = styled.div`
     border-radius: 5px;
-    color: #fff;
-    background: #1b252d6b;
+    opacity:0;
+    color: rgb(0,120,212);
+    background: rgba(0,0,0,0.2);
     padding: 5px 8px;
     display: inline-block;
     white-space: nowrap;

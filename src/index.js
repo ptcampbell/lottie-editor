@@ -16,7 +16,6 @@ import './assets/styles/react-color-overwrite.css';
 const App = () => (
   <MuiThemeProvider theme={theme}>
     <CssBaseline />
-
     <Root />
   </MuiThemeProvider>
 );

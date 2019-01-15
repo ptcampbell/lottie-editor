@@ -21,7 +21,7 @@ export default class Browse extends React.Component<{}, {}> {
                 id: '2',
                 title: 'Test',
                 tags: ['shot', 'glasses', 'ono'],
-                file: 'test.json'
+                file: 'woman.json'
             }
         ],
         filter: null
@@ -49,9 +49,15 @@ export default class Browse extends React.Component<{}, {}> {
                     {/* <Icon iconName="Search" /> */}
                     <input placeholder="Find an illustration" onChange={(value) => this.handleSetFilter(value)} value={filter || ''} />
                 </Filter>
+                <Header>
+                    <Inner>
+                        <Title>Animation library</Title>
+                        <p>Text</p>
+                    </Inner>
+                </Header>
                 <Grid
                     component="ul"
-                    columns={3}
+                    columns={4}
                     columnWidth={250}
                     itemHeight={250}
                     gutterWidth={25}
@@ -64,9 +70,6 @@ export default class Browse extends React.Component<{}, {}> {
                         </li>
                     ))}
                 </Grid>
-                <Footer>
-                    <p>XCS Illustration Toolkit</p>
-                </Footer>
                 <Blur />
             </StyledBrowse>
         );
@@ -75,11 +78,29 @@ export default class Browse extends React.Component<{}, {}> {
 
 const StyledBrowse = styled.div`
     margin:0 auto;
+    width:100%;
+    padding:0;
     color: #8898aa;
 `;
 
+const Header = styled.div`
+    background:#fff;
+    height:320px;
+    margin:0 auto;
+`;
+
+const Title = styled.h1`
+    letter-spacing: -0.02em;
+    white-space: pre-line;
+    color: rgb(0, 120, 212);
+    padding: 90px 0 0 0;
+    font-size: 34px;
+    line-height: 48px;
+    margin:0;
+`;
+
 const Grid = styled(SpringGrid)`
-    margin: 0 auto;
+    margin: -60px auto 0 auto;
     padding: 0 0 140px 0;
 
     li {
@@ -125,27 +146,6 @@ const Filter = styled.div`
     }
 `;
 
-const Footer = styled.footer`
-    position: fixed;
-    display: flex;
-    justify-content: space-between;
-    height: 50px;
-    width: 100%;
-    border-top: 1px solid #8898aa45;
-    bottom: 0px;
-    left: 0px;
-    z-index: 99;
-    backdrop-filter: blur(5px);
-
-    p {
-        margin: 15px 20px;
-    }
-
-    .SVGInline {
-        margin: 12px 20px;
-    }
-`;
-
 const Blur = styled.div`
     position: fixed;
     left: 0;
@@ -155,4 +155,9 @@ const Blur = styled.div`
     z-index: 95;
     background-color: #f6f9fce8;
     backdrop-filter: blur(5px);
+`;
+
+const Inner = styled.div`
+    width:1075px;
+    margin:0 auto;
 `;
