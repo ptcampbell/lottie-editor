@@ -66,7 +66,7 @@ export default class Lottie extends Component {
 
     const animation = (
       <Full style={{ maxHeight, width }}>
-        <div ref={this.play} />
+        <div className="animationWrapper" ref={this.play} />
       </Full>
     );
 

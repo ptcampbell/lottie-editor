@@ -39,6 +39,14 @@ body,
   margin:-30px;
 }
 
+.IgnoreFill {
+  display:none!important;
+}
+
+.animationWrapper {
+  height:100vh;
+}
+
 .canvas {
   display:flex;
   width:calc(100% - 391px);
@@ -53,6 +61,9 @@ body,
   margin:auto 0;
 }
 
+.animation svg {
+    height:100vh;
+}
 
 .right-panel {
   position:fixed;
