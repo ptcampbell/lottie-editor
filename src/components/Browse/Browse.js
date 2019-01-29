@@ -41,14 +41,13 @@ export default class Browse extends React.Component<{}, {}> {
     }
 
     render() {
-        const { illustrations = {}, filter } = this.state;
+        const { illustrations = {} } = this.state;
 
         return (
             <StyledBrowse>
-                <Filter>
-                    {/* <Icon iconName="Search" /> */}
+                {/* <Filter>
                     <input placeholder="Find an illustration" onChange={(value) => this.handleSetFilter(value)} value={filter || ''} />
-                </Filter>
+                </Filter> */}
                 <Header>
                     <Inner>
                         <Title>Animation library</Title>
@@ -112,39 +111,39 @@ const Grid = styled(SpringGrid)`
     }
 `;
 
-const Filter = styled.div`
-    display: flex;
-    margin: 50px auto;
-    border: 1px solid #8898aa45;
-    border-radius: 5px;
-    padding: 8px 12px;
-    width: 400px;
+// const Filter = styled.div`
+//     display: flex;
+//     margin: 50px auto;
+//     border: 1px solid #8898aa45;
+//     border-radius: 5px;
+//     padding: 8px 12px;
+//     width: 400px;
 
-    i {
-        font-size: 20px;
-        transform: scaleX(-1) translate(-6px, 7px);
-    }
+//     i {
+//         font-size: 20px;
+//         transform: scaleX(-1) translate(-6px, 7px);
+//     }
 
-    input {
-        padding: 0;
-        border: 0;
-        margin: 0 0 0 20px;
-        background: transparent;
-        flex: auto;
-        font-size: 27px;
-        opacity: 1;
-        letter-spacing: -1px;
-        font-weight: 300;
-        color: #8898aa;
+//     input {
+//         padding: 0;
+//         border: 0;
+//         margin: 0 0 0 20px;
+//         background: transparent;
+//         flex: auto;
+//         font-size: 27px;
+//         opacity: 1;
+//         letter-spacing: -1px;
+//         font-weight: 300;
+//         color: #8898aa;
 
-        &::placeholder {
-            color: #8898aa;
-        }
-        &:focus {
-            outline: none;
-        }
-    }
-`;
+//         &::placeholder {
+//             color: #8898aa;
+//         }
+//         &:focus {
+//             outline: none;
+//         }
+//     }
+// `;
 
 const Blur = styled.div`
     position: fixed;

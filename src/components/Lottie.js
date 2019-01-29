@@ -3,9 +3,6 @@ import React, { Component } from 'react';
 import lottie from 'lottie-web/build/player/lottie.min';
 import PropTypes from 'prop-types';
 
-import Full from './Full';
-import Landing from './Landing';
-
 export default class Lottie extends Component {
   static propTypes = {
     config: PropTypes.object,
@@ -56,7 +53,7 @@ export default class Lottie extends Component {
     if (err) {
       if (!fallback) return null;
 
-      if (landing) return <Landing>{fallback}</Landing>;
+      if (landing) return <div>{fallback}</div>;
 
       return fallback;
     }
@@ -65,12 +62,12 @@ export default class Lottie extends Component {
     const width = (dimensions && dimensions.width) || null;
 
     const animation = (
-      <Full style={{ maxHeight, width }}>
+      <div style={{ maxHeight, width }}>
         <div className="animationWrapper" ref={this.play} />
-      </Full>
+      </div>
     );
 
-    if (landing) return <Landing>{animation}</Landing>;
+    if (landing) return <div>{animation}</div>;
 
     return animation;
   }

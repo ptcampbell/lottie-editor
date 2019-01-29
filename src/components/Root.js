@@ -1,30 +1,17 @@
-/* eslint-disable max-len */
-/* eslint-disable react/sort-comp */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable react/prop-types */
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable no-shadow */
 import React, { Component } from 'react';
 
-import { diff } from 'diff';
-import { uniqBy } from 'lodash';
+import { uniqBy, difference } from 'lodash';
 import { hexToRgb } from 'color-invert';
 import { TwitterPicker as Picker } from 'react-color';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
-// import Dropzone from 'react-dropzone';
-import log from 'log-with-style';
-import Snack from '@material-ui/core/Snackbar';
 
 import colors from '../configs/colors';
 import getColors from '../configs/algorithm';
 
 import { download, toUnitVector } from '../configs/utils';
 
-import Btn from './Btn';
 import ErrorView from './ErrorView';
-import Icon from './Icon';
 import Lottie from './Lottie';
 import Browse from './Browse/Browse';
 
@@ -38,10 +25,29 @@ export default class extends Component {
     presetColors: Object.values(colors),
     rows: [],
     selectedRow: -1,
-    snack: false,
-    snackMessage: '',
     showLayerNames: false
   };
+
+  componentDidMount() {
+    const divs = document.getElementsByClassName('swatch');
+    const child_list = [];
+
+    console.log(divs);
+
+    for (let i = 0; i < divs.length; i++) {
+      if (divs[i].className.indexOf('swatch') > -1) {
+        // eslint-disable-next-line prefer-destructuring
+        const className = divs[i].className;
+        // eslint-disable-next-line
+        const number = parseInt(className.substr(className.indexOf('.') + 1, className.length));
+        if (child_list.indexOf(number) > -1) {
+          divs[i].style.display = 'none';
+        } else {
+          child_list.push(number);
+        }
+      }
+    }
+  }
 
   componentWillMount() {
     const url = (window.location.href.split('src=')[1] || '').split('&')[0];
@@ -55,12 +61,10 @@ export default class extends Component {
       fetch(url)
         .then(res => res.json())
         .then(json => this.parse(JSON.stringify(json), fileName))
-        .catch(err =>
+        .catch(() =>
           this.setState({
             err: true,
-            loading: false,
-            snack: true,
-            snackMessage: err.message
+            loading: false
           })
         )
     );
@@ -170,40 +174,8 @@ export default class extends Component {
 
   export = () => {
     const { json, jsonName } = this.state;
-
     download(json, jsonName);
-
-    setTimeout(() => this.showSnack('Diff is available in the console.'), 500);
-
-    log('Computing diff ..');
-
-    let additions = 0;
-    let deletions = 0;
-
-    const original = JSON.stringify(JSON.parse(this.original), null, 2);
-    const parsed = JSON.stringify(JSON.parse(json), null, 2);
-
-    diff(original, parsed, {
-      newlineIsToken: true
-    }).forEach(part => {
-      const { added, removed, value } = part;
-
-      const color = added ? 'green' : removed ? 'red' : null;
-
-      if (color) log(`[c="color: ${color};"]${added ? '+' : '-'} ${value}[c]`);
-
-      if (added) additions += value.length;
-      else if (removed) deletions += value.length;
-    });
-
-    log(
-      `[c="color: green;"]${additions} additions[c], [c="color: red;"]${deletions} deletions[c].`
-    );
   };
-
-  showSnack = snackMessage => this.setState({ snack: true, snackMessage });
-
-  closeSnack = () => this.setState({ snack: false });
 
   toggleNames = () =>
     this.setState(state => ({ showLayerNames: !state.showLayerNames }));
@@ -221,9 +193,7 @@ export default class extends Component {
       presetColors,
       showLayerNames,
       rows,
-      selectedRow,
-      snack,
-      snackMessage
+      selectedRow
     } = this.state;
 
     const Animation = () =>
@@ -241,9 +211,11 @@ export default class extends Component {
         const { color, nm, index } = props;
         const truncatedName = nm.replace(/^#/, '');
         const isActive = index === selectedRow;
+
+        // eslint-disable-next-line no-undef
         return (
             <div
-              className={`swatch index_${index}`}
+              className={`swatch index_${index} ${truncatedName}`}
               onClick={() =>
                 this.setState({
                   picker: !picker,
@@ -277,12 +249,20 @@ export default class extends Component {
 
     const Palette = props => {
         const { rows } = props;
-        // const unique = uniqBy(rows, 'nm');
-        console.log(rows);
+        const unique = uniqBy(rows, 'nm');
+        const diff = difference(rows, unique);
+        // const newY = concat(unique, diff);
+
+        console.log('diff', diff);
+        console.log('unique', unique);
+        console.log('rows', rows);
 
         return (
             <div className="palette">
-              {rows.map((item, index) => <Swatch {...item} key={index} index={index} />)}
+              {rows.map((item, index) => {
+                uniqBy(rows, 'nm');
+                return <Swatch {...item} key={index} index={index} />;
+              })}
             </div>
         );
     };
@@ -309,48 +289,12 @@ export default class extends Component {
                 showLayerNames={showLayerNames}
               />
               <div className="export">
-                <Btn color="primary" variant="raised" onClick={this.export}>
-                    <Icon name="FileDownload" />
-                </Btn>
+                <button color="primary" variant="raised" onClick={this.export}>
+                    Download JSON
+                </button>
               </div>
             </div>
         )}
-        {/*
-        // dropzone
-        <div className="dropzone">
-          <Dropzone
-            className="uploader"
-            accept="application/json"
-            multiple={false}
-            onDrop={this.upload}
-          >
-            {loading && (
-              <div className="loading-animation">
-                <CircularProgress />
-              </div>
-            )}
-            {!loading && (
-              <div>
-                {err ? (
-                  <ErrorView />
-                ) : (
-                  <div className="upload-input">
-                    <Icon
-                      name="FileUpload"
-                      size={128}
-                    />
-                    <h3>Drag and drop your JSON</h3>
-                  </div>
-                )}
-              </div>
-            )}
-          </Dropzone>
-        </div> */}
-        <Snack
-          autoHideDuration={4000}
-          message={snackMessage}
-          open={snack}
-        />
       </div>
     );
   }
