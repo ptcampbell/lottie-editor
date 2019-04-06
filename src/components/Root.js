@@ -1,25 +1,25 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
-import { uniqBy, difference } from 'lodash';
-import { hexToRgb } from 'color-invert';
-import { TwitterPicker as Picker } from 'react-color';
+import { uniqBy, difference } from "lodash";
+import { hexToRgb } from "color-invert";
+import { TwitterPicker as Picker } from "react-color";
+import { injectGlobal } from "styled-components";
 
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-import colors from '../configs/colors';
-import getColors from '../configs/algorithm';
+import colors from "../configs/colors";
+import getColors from "../configs/algorithm";
 
-import { download, toUnitVector } from '../configs/utils';
+import { download, toUnitVector } from "../configs/utils";
 
-import ErrorView from './ErrorView';
-import Lottie from './Lottie';
-import Browse from './Browse/Browse';
+import ErrorView from "./ErrorView";
+import Lottie from "./Lottie";
 
 export default class extends Component {
   state = {
     err: false,
-    json: '',
-    jsonName: '',
+    json: "",
+    jsonName: "",
     loading: false,
     picker: false,
     presetColors: Object.values(colors),
@@ -29,35 +29,18 @@ export default class extends Component {
   };
 
   componentDidMount() {
-    const divs = document.getElementsByClassName('swatch');
-    const child_list = [];
-
-    console.log(divs);
-
-    for (let i = 0; i < divs.length; i++) {
-      if (divs[i].className.indexOf('swatch') > -1) {
-        // eslint-disable-next-line prefer-destructuring
-        const className = divs[i].className;
-        // eslint-disable-next-line
-        const number = parseInt(className.substr(className.indexOf('.') + 1, className.length));
-        if (child_list.indexOf(number) > -1) {
-          divs[i].style.display = 'none';
-        } else {
-          child_list.push(number);
-        }
-      }
-    }
+    const divs = document.getElementsByClassName("swatch");
   }
 
   componentWillMount() {
-    const url = (window.location.href.split('src=')[1] || '').split('&')[0];
-    if (url) this.fetchUrl(url, 'animation.json');
+    const url = (window.location.href.split("src=")[1] || "").split("&")[0];
+    if (url) this.fetchUrl(url, "animation.json");
   }
 
-  original = '';
+  original = "";
 
   fetchUrl = (url, fileName) =>
-    this.setState({ json: '', err: '', loading: true }, () =>
+    this.setState({ json: "", err: "", loading: true }, () =>
       fetch(url)
         .then(res => res.json())
         .then(json => this.parse(JSON.stringify(json), fileName))
@@ -95,7 +78,7 @@ export default class extends Component {
 
     const { r, g, b } = hexToRgb(newColor);
 
-    duplicateColors.forEach((item) => {
+    duplicateColors.forEach(item => {
       const { i, j, k, a, asset } = rows[item];
       if (asset === -1) {
         if (newJson && newJson.layers) {
@@ -131,7 +114,7 @@ export default class extends Component {
       const animation = this.addAnimation.ref;
       animation.setSpeed(3);
       animation.play();
-      animation.addEventListener('complete', () =>
+      animation.addEventListener("complete", () =>
         setTimeout(() => animation.goToAndStop(0), 500)
       );
     }
@@ -168,7 +151,19 @@ export default class extends Component {
         );
       }
 
-      setTimeout(() => this.setState({ rows, jsonName, loading: false }), 500);
+      setTimeout(() => {
+        // after running algorithm, set palette to state
+        this.setState({ rows, jsonName, loading: false });
+        // get unique color names from array
+        const uniqueRows = uniqBy(rows, "nm");
+        const uniqueColors = [];
+        uniqueRows.forEach(row => {
+          const colorName = row.nm.replace(/^#/, "");
+          uniqueColors.push(colorName);
+        });
+        // set pallette to state
+        this.setState({ palette: uniqueColors });
+      }, 500);
     });
   };
 
@@ -176,12 +171,6 @@ export default class extends Component {
     const { json, jsonName } = this.state;
     download(json, jsonName);
   };
-
-  toggleNames = () =>
-    this.setState(state => ({ showLayerNames: !state.showLayerNames }));
-
-  toggleGroups = () =>
-    this.setState(state => ({ groupDuplicates: !state.groupDuplicates }));
 
   render() {
     const {
@@ -207,95 +196,91 @@ export default class extends Component {
       );
 
     const Swatch = props => {
-        // eslint-disable-next-line react/prop-types
-        const { color, nm, index } = props;
-        const truncatedName = nm.replace(/^#/, '');
-        const isActive = index === selectedRow;
+      // eslint-disable-next-line react/prop-types
+      const { color, nm, index } = props;
+      const truncatedName = nm.replace(/^#/, "");
+      const isActive = index === selectedRow;
 
-        // eslint-disable-next-line no-undef
-        return (
-            <div
-              className={`swatch index_${index} ${truncatedName}`}
-              onClick={() =>
-                this.setState({
-                  picker: !picker,
-                  selectedRow: index
-                })
-            }>
-               {isActive &&
-                picker && (
-                  <div className="popover">
-                    <div // eslint-disable-line
-                      onClick={this.hidePicker}
-                      className="picker-cover"
-                    />
-                    <Picker
-                      color={color}
-                      disableAlpha
-                      onChange={this.pickColor}
-                      presetColors={presetColors}
-                      triangle="top-right"
-                    />
-                  </div>
-              )}
-              <div className="color" style={{ backgroundColor: color }} />
-              <div className="label">
-                <p>{truncatedName}</p>
-                <p>{color}</p>
-              </div>
+      // eslint-disable-next-line no-undef
+      return (
+        <div
+          className={`swatch index_${index} ${truncatedName}`}
+          onClick={() =>
+            this.setState({
+              picker: !picker,
+              selectedRow: index
+            })
+          }
+        >
+          {isActive && picker && (
+            <div className="popover">
+              <div // eslint-disable-line
+                onClick={this.hidePicker}
+                className="picker-cover"
+              />
+              <Picker
+                color={color}
+                disableAlpha
+                onChange={this.pickColor}
+                presetColors={presetColors}
+                triangle="top-right"
+              />
             </div>
-        );
+          )}
+          <div className="color" style={{ backgroundColor: color }} />
+          <div className="label">
+            <p>{truncatedName}</p>
+            <p>{color}</p>
+          </div>
+        </div>
+      );
     };
 
     const Palette = props => {
-        const { rows } = props;
-        const unique = uniqBy(rows, 'nm');
-        const diff = difference(rows, unique);
-        // const newY = concat(unique, diff);
-
-        console.log('diff', diff);
-        console.log('unique', unique);
-        console.log('rows', rows);
-
-        return (
-            <div className="palette">
-              {rows.map((item, index) => {
-                uniqBy(rows, 'nm');
-                return <Swatch {...item} key={index} index={index} />;
-              })}
-            </div>
-        );
+      const { rows } = props;
+      return (
+        <div className="palette">
+          {rows.map((item, index) => {
+            return <Swatch {...item} key={index} index={index} />;
+          })}
+        </div>
+      );
     };
 
     return (
       <div className="app-wrapper">
-        {!json && <Browse />}
+        {!json && <p>no json loaded</p>}
         {loading && (
-            <div className="loading-animation">
-              <CircularProgress />
-            </div>
+          <div className="loading-animation">
+            <CircularProgress />
+          </div>
         )}
         {json && !loading && (
           <div className="canvas">
             <Animation />
           </div>
         )}
-        {!loading &&
-          json && (
-            <div className="right-panel">
-              <Palette
-                rows={rows}
-                picker={picker}
-                showLayerNames={showLayerNames}
-              />
-              <div className="export">
-                <button color="primary" variant="raised" onClick={this.export}>
-                    Download JSON
-                </button>
-              </div>
-            </div>
+        {!loading && json && (
+          <div className="right-panel">
+            <Palette
+              rows={rows}
+              picker={picker}
+              showLayerNames={showLayerNames}
+            />
+          </div>
         )}
       </div>
     );
   }
 }
+
+injectGlobal`
+  .palette {
+  div.Hair {
+    visibility:hidden;
+  }
+  div.Hair:nth-child(n+1) {
+    visibility:visible;
+  }
+}
+`;
